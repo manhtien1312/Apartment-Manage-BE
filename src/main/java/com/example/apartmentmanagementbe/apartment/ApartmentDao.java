@@ -14,8 +14,9 @@ public class ApartmentDao {
 	private String jdbcUsername = "root";
 	private String jdbcPassword = "tiennguyen1312";
 	
-	private static final String SELECT_ALL_APARTMENTS = "select * from apartment";
+	private static final String SELECT_ALL_APARTMENTS = "select * from apartment order by apartmentid";
 	private static final String SELECT_APARTMENT_BY_ID = "select * from apartment where apartmentid=?";
+	private static final String UPDATE_APARTMENT_SQL = "update apartment set area=?, rooms=?, status=?, owner=? where apartmentid=?";
 	
 	public ApartmentDao() {}
 	
@@ -79,5 +80,21 @@ public class ApartmentDao {
 		return apartment;
 	}
 	
+	public void updateApartment(Apartment apartment) {
+		try {
+			Connection con = getConnection();
+			PreparedStatement ps = con.prepareStatement(UPDATE_APARTMENT_SQL);
+			int result = 0;
+			ps.setInt(1, apartment.getArea());
+			ps.setInt(2, apartment.getRooms());
+			ps.setString(3, apartment.getStatus());
+			ps.setString(4, apartment.getOwner());
+			ps.setString(5, apartment.getApartmentId());
+			result = ps.executeUpdate();
+		} catch (SQLException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+	}
 	
 }

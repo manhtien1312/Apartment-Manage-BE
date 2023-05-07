@@ -15,8 +15,11 @@ public class EmployeeDao {
 	private String jdbcUsername = "root";
 	private String jdbcPassword = "tiennguyen1312";
 	
-	private static final String SELECT_ALL_EMPLOYEES = "select * from employee";
+	private static final String SELECT_ALL_EMPLOYEES = "select * from employee order by position";
 	private static final String SELECT_EMPLOYEE_BY_ID = "select * from employee where employeeid=?";
+	private static final String UPDATE_EMPLOYEE_SQL = "update employee set name=?, gender=?, dob=?, address=?, phone=?, position=? where employeeid=?";
+	private static final String INSERT_EMPLOYEE_SQL = "insert into employee (name, gender, dob, address, phone, position) values (?, ?, ?, ?, ?, ?)";
+	private static final String DELETE_EMPLOYEE_BY_ID = "delete from employee where employeeid=?";
 	
 	public EmployeeDao() {}
 	
@@ -79,6 +82,53 @@ public class EmployeeDao {
 			e.printStackTrace();
 		}
 		return employee;
+	}
+	
+	public void updateEmployee(Employee employee) {
+		try {
+			Connection con = getConnection();
+			PreparedStatement ps = con.prepareStatement(UPDATE_EMPLOYEE_SQL);
+			ps.setString(1, employee.getName());
+			ps.setString(2, employee.getGender());
+			ps.setDate(3, new java.sql.Date(employee.getDob().getTime()));
+			ps.setString(4, employee.getAddress());
+			ps.setString(5, employee.getPhone());
+			ps.setString(6, employee.getPosition());
+			ps.setInt(7, employee.getEmployeeId());
+			int result = ps.executeUpdate();
+		} catch (SQLException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+	}
+	
+	public void insertEmployee(Employee employee) {
+		try {
+			Connection con = getConnection();
+			PreparedStatement ps = con.prepareStatement(INSERT_EMPLOYEE_SQL);
+			ps.setString(1, employee.getName());
+			ps.setString(2, employee.getGender());
+			ps.setDate(3, new java.sql.Date(employee.getDob().getTime()));
+			ps.setString(4, employee.getAddress());
+			ps.setString(5, employee.getPhone());
+			ps.setString(6, employee.getPosition());
+			int result = ps.executeUpdate();
+		} catch (SQLException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+	}
+	
+	public void deleteEmployee(int id) {
+		try {
+			Connection con = getConnection();
+			PreparedStatement ps = con.prepareStatement(DELETE_EMPLOYEE_BY_ID);
+			ps.setInt(1, id);
+			int result = ps.executeUpdate();
+		} catch (SQLException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
 	}
 	
 }
