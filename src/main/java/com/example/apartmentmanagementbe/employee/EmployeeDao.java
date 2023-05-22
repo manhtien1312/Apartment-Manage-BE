@@ -5,15 +5,24 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.StringTokenizer;
+import java.util.regex.Pattern;
+
+import com.example.apartmentmanagementbe.manageraccount.ManagerAccount;
+import com.example.apartmentmanagementbe.manageraccount.ManagerAccountDAO;
 
 public class EmployeeDao {
 
 	private String jdbcUrl = "jdbc:mysql://localhost:3306/apartment_management";
 	private String jdbcUsername = "root";
 	private String jdbcPassword = "tiennguyen1312";
+	public ManagerAccountDAO dao = new ManagerAccountDAO();
 	
 	private static final String SELECT_ALL_EMPLOYEES = "select * from employee order by position";
 	private static final String SELECT_EMPLOYEE_BY_ID = "select * from employee where employeeid=?";
@@ -113,6 +122,37 @@ public class EmployeeDao {
 			ps.setString(5, employee.getPhone());
 			ps.setString(6, employee.getPosition());
 			int result = ps.executeUpdate();
+			
+			if (employee.getPosition().equals("Quản lý")) {
+				
+				List <String> words = new ArrayList<>();
+				StringTokenizer st = new StringTokenizer(employee.getName());
+				StringBuilder username = new StringBuilder();
+				StringBuilder password = new StringBuilder();
+				
+				while (st.hasMoreTokens()) {
+					words.add(removeAccent(st.nextToken().toLowerCase()));
+				}
+				username.append(words.get(words.size()-1));
+				for (int i=0; i<words.size()-1; i++) {
+					username.append(words.get(i).charAt(0));
+				}
+				Calendar calendar = new GregorianCalendar();
+				calendar.setTime(employee.getDob());
+				username.append(calendar.get(Calendar.YEAR));
+				if (calendar.get(Calendar.DAY_OF_MONTH) < 10) {
+					password.append(0);
+				}
+				password.append(calendar.get(Calendar.DAY_OF_MONTH));
+				if (calendar.get(Calendar.MONTH)+1 < 10) {
+					password.append(0);
+				}
+				password.append(calendar.get(Calendar.MONTH)+1);
+				password.append(calendar.get(Calendar.YEAR));
+				
+				ManagerAccount account = new ManagerAccount(0, username.toString(), password.toString(), employee.getName());
+				dao.insertAccount(account);
+			}
 		} catch (SQLException e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -130,5 +170,12 @@ public class EmployeeDao {
 			e.printStackTrace();
 		}
 	}
+	
+	private String removeAccent(String s) {
+		String temp = Normalizer.normalize(s, Normalizer.Form.NFD);
+		Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+		return pattern.matcher(temp).replaceAll("");
+	}
+	
 	
 }

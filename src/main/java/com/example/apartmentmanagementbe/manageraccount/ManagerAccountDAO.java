@@ -14,6 +14,7 @@ public class ManagerAccountDAO {
 	
 	private static final String SELECT_ACOUNT_BY_USERNAME_AND_PASSWORD = "select * from manager_account where username=? and password=?";
 	private static final String CHANGE_PASSWORD = "update manager_account set password=? where id=?";
+	private static final String INSERT_ACCOUNT = "insert into manager_account (username, password, fullname) values(?, ?, ?)";
 	
 	public ManagerAccountDAO() {}
 	
@@ -56,6 +57,20 @@ public class ManagerAccountDAO {
 			e.printStackTrace();
 		}
 		return account;
+	}
+	
+	public void insertAccount (ManagerAccount account) {
+		try {
+			Connection con = getConnection();
+			PreparedStatement ps = con.prepareStatement(INSERT_ACCOUNT);
+			ps.setString(1, account.getUsername());
+			ps.setString(2, account.getPassword());
+			ps.setString(3, account.getFullName());
+			int result = ps.executeUpdate();
+		} catch (SQLException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
 	}
 
 }

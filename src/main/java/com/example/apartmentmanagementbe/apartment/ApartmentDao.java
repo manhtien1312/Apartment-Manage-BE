@@ -17,6 +17,7 @@ public class ApartmentDao {
 	private static final String SELECT_ALL_APARTMENTS = "select * from apartment order by apartmentid";
 	private static final String SELECT_APARTMENT_BY_ID = "select * from apartment where apartmentid=?";
 	private static final String UPDATE_APARTMENT_SQL = "update apartment set area=?, rooms=?, status=?, owner=? where apartmentid=?";
+	private static final String UPDATE_APARTMENT_OWNER = "update apartment set status=?, owner=? where apartmentid=?";
 	
 	public ApartmentDao() {}
 	
@@ -48,7 +49,14 @@ public class ApartmentDao {
 				String status = rs.getString("status");
 				String owner = "";
 				if (rs.getString("owner") != null) owner = rs.getString("owner");
-				apartments.add(new Apartment(apartmentId, area, rooms, status, owner));
+				int cars = rs.getInt("cars");
+				int motorbikes = rs.getInt("motorbikes");
+				int bikes = rs.getInt("bikes");
+				int electricbikes = rs.getInt("electricbikes");
+				int electric = rs.getInt("electric");
+				int water = rs.getInt("water");
+				int loan = rs.getInt("loan");
+				apartments.add(new Apartment(apartmentId, area, rooms, status, owner, cars, motorbikes, bikes, electricbikes, electric, water, loan));
 			}
 		} catch (SQLException e) {
 			// TODO: handle exception
@@ -72,6 +80,13 @@ public class ApartmentDao {
 				String owner = "";
 				if (rs.getString("owner") != null) owner = rs.getString("owner");
 				apartment.setOwner(owner);
+				apartment.setCars(rs.getInt("cars"));
+				apartment.setMotorbikes(rs.getInt("motorbikes"));
+				apartment.setBikes(rs.getInt("bikes"));
+				apartment.setElectricbikes(rs.getInt("electricbikes"));
+				apartment.setElectric(rs.getInt("electric"));
+				apartment.setWater(rs.getInt("water"));
+				apartment.setLoan(rs.getInt("loan"));
 			}
 		} catch (SQLException e) {
 			// TODO: handle exception
@@ -90,6 +105,21 @@ public class ApartmentDao {
 			ps.setString(3, apartment.getStatus());
 			ps.setString(4, apartment.getOwner());
 			ps.setString(5, apartment.getApartmentId());
+			result = ps.executeUpdate();
+		} catch (SQLException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+	}
+	
+	public void updateApartmentOwner(String status, String owner, String apartmentId) {
+		try {
+			Connection con = getConnection();
+			PreparedStatement ps = con.prepareStatement(UPDATE_APARTMENT_OWNER);
+			int result = 0;
+			ps.setString(1, status);
+			ps.setString(2, owner);
+			ps.setString(3, apartmentId);
 			result = ps.executeUpdate();
 		} catch (SQLException e) {
 			// TODO: handle exception

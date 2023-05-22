@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.example.apartmentmanagementbe.manageraccount.ManagerAccount;
+
 public class ResidentAccountDAO {
 
 	private String jdbcUrl = "jdbc:mysql://localhost:3306/apartment_management";
@@ -14,6 +16,7 @@ public class ResidentAccountDAO {
 	
 	private static final String SELECT_ACOUNT_BY_USERNAME_AND_PASSWORD = "select * from resident_account where username=? and password=?";
 	private static final String CHANGE_PASSWORD = "update resident_account set password=? where id=?";
+	private static final String INSERT_ACCOUNT = "insert into resident_account values(?, ?, ?, ?)";
 	
 	public ResidentAccountDAO() {}
 	
@@ -56,6 +59,21 @@ public class ResidentAccountDAO {
 			e.printStackTrace();
 		}
 		return account;
+	}
+	
+	public void insertAccount (ResidentAccount account) {
+		try {
+			Connection con = getConnection();
+			PreparedStatement ps = con.prepareStatement(INSERT_ACCOUNT);
+			ps.setString(1, account.getId());
+			ps.setString(2, account.getUsername());
+			ps.setString(3, account.getPassword());
+			ps.setString(4, account.getFullName());
+			int result = ps.executeUpdate();
+		} catch (SQLException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
 	}
 	
 }
