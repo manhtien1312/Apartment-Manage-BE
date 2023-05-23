@@ -22,14 +22,18 @@ public class BillDao {
 	private ApartmentDao dao = new ApartmentDao();
 	
 	private static final String GET_LASTEST_BILLS = "select * from bill where (apartment, month) in (select apartment, max(month) from bill group by apartment)";
+	private static final String SELECT_LASTEST_BILL_BY_APARTMENT = "select * from bill where apartment=? order by month desc limit 1;";
 	private static final String SELECT_BILL_BY_ID = "select * from bill where id=?";
-	private static final String SELECT_SERVICE_PRICE = "select * from price_list_service";
 	private static final String INSERT_BILL = "insert into bill(month, apartment, car_expense, motorbike_expense, electricbike_expense, bike_expense, service_expense,"
-																+ "water_expense, electric_expense, total, loan_before, payed, loan_after, status, water_num, electric_num)"
-																+ "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+											+ "water_expense, electric_expense, total, loan_before, payed, loan_after, status, water_num, electric_num)"
+											+ "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String PAY_BILL = "update bill set payed=?, loan_after=?, status=? where id=?";
 	private static final String UPDATE_LOAN = "update apartment set loan=? where apartmentid=?";
 	private static final String UPDATE_APARTMENT_SERVICE = "update apartment set electric=?, water=? where apartmentid=?";
+	private static final String SELECT_SERVICE_PRICE = "select * from price_list_service";
+	private static final String UPDATE_SERVICE_PRICE = "update price_list_service set car_price=?, motorbike_price=?, bike_price=?, "
+														+ "electricbike_price=?, electric_price=?, water_price=?, room_service_price=? "
+														+ "where id=1";
 	
 	public BillDao() {}
 	
@@ -84,6 +88,43 @@ public class BillDao {
 			e.printStackTrace();
 		}
 		return lastestBills;
+	}
+	
+	public Bill selectLastestBillByApartment(String apartmentId) {
+		Bill bill = new Bill();
+		try {
+			Connection con = getConnection();
+			PreparedStatement ps = con.prepareStatement(SELECT_LASTEST_BILL_BY_APARTMENT);
+			ps.setString(1, apartmentId);
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				bill.setId(rs.getInt("id"));
+				Date date = rs.getDate("month");
+				Calendar calendar = new GregorianCalendar();
+				calendar.setTime(date);
+				bill.setMonth(calendar.get(Calendar.MONTH)+1);
+				bill.setYear(calendar.get(Calendar.YEAR));
+				bill.setApartment(rs.getString("apartment"));
+				bill.setCarExpense(rs.getInt("car_expense"));
+				bill.setMotorbikeExpense(rs.getInt("motorbike_expense"));
+				bill.setElectricbikeExpense(rs.getInt("electricbike_expense"));
+				bill.setBikeExpense(rs.getInt("bike_expense"));
+				bill.setServiceExpense(rs.getInt("service_expense"));
+				bill.setWaterNum(rs.getInt("water_num"));
+				bill.setWaterExpense(rs.getInt("water_expense"));
+				bill.setElectricNum(rs.getInt("electric_num"));
+				bill.setElectricExpense(rs.getInt("electric_expense"));
+				bill.setTotal(rs.getInt("total"));
+				bill.setLoanBefore(rs.getInt("loan_before"));
+				bill.setPayed(rs.getInt("payed"));
+				bill.setLoanAfter(rs.getInt("loan_after"));
+				bill.setStatus(rs.getInt("status")==0? "Chưa thanh toán" : "Đã thanh toán");
+			}
+		} catch (SQLException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		return bill;
 	}
 	
 	public Bill selectBill(int id) {
@@ -223,4 +264,21 @@ public class BillDao {
 		return sp;
 	}
 	
+	public void updateServicePrice(ServicePrice sp) {
+		try {
+			Connection con = getConnection();
+			PreparedStatement ps = con.prepareStatement(UPDATE_SERVICE_PRICE);
+			ps.setInt(1, sp.getCarPrice());
+			ps.setInt(2, sp.getMotorbikePrice());
+			ps.setInt(3, sp.getBikePrice());
+			ps.setInt(4, sp.getElectricbikePrice());
+			ps.setInt(5, sp.getElectricPrice());
+			ps.setInt(6, sp.getWaterPrice());
+			ps.setInt(7, sp.getRoomServicePrice());
+			int result = ps.executeUpdate();
+		} catch (SQLException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+	}
 }

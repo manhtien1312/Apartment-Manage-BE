@@ -76,4 +76,17 @@ public class ResidentAccountDAO {
 		}
 	}
 	
+	public void updateAccount (String newPass, String id) {
+		try {
+			Connection con = getConnection();
+			PreparedStatement ps = con.prepareStatement(CHANGE_PASSWORD);
+			ps.setString(1, newPass);
+			ps.setString(2, id);
+			int result = ps.executeUpdate();
+		} catch (SQLException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+	}
+	
 }

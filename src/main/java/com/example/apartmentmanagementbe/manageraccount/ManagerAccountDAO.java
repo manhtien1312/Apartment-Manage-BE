@@ -72,5 +72,18 @@ public class ManagerAccountDAO {
 			e.printStackTrace();
 		}
 	}
+	
+	public void updateAccount (String newPass, int id) {
+		try {
+			Connection con = getConnection();
+			PreparedStatement ps = con.prepareStatement(CHANGE_PASSWORD);
+			ps.setString(1, newPass);
+			ps.setInt(2, id);
+			int result = ps.executeUpdate();
+		} catch (SQLException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+	}
 
 }

@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -26,6 +28,12 @@ public class BillController {
 		return lastestBills;
 	}
 	
+	@GetMapping("/lastest-bill/{apartmentId}")
+	public Bill getLastestBill (@PathVariable String apartmentId) throws IOException{
+		Bill bill = billDao.selectLastestBillByApartment(apartmentId);
+		return bill;
+	}
+	
 	@GetMapping("/bill/{id}")
 	public Bill getBill(@PathVariable String id) throws IOException{
 		Bill bill = billDao.selectBill(Integer.valueOf(id));
@@ -36,6 +44,12 @@ public class BillController {
 	public ServicePrice getServicePrice() throws IOException{
 		ServicePrice sp = billDao.selectServicePrice();
 		return sp;
+	}
+	
+	@PutMapping("/bill/price-list/save")
+	public void updateServicePrice(@RequestBody ServicePrice sp)
+		throws JsonMappingException, JsonProcessingException, SQLException{
+		billDao.updateServicePrice(sp);
 	}
 	
 	@PostMapping("/bill/payment")

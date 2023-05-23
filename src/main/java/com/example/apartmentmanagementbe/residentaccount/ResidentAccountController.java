@@ -22,4 +22,10 @@ public class ResidentAccountController {
 		ResidentAccount accResponse = dao.getAccount(acc.getUsername(), acc.getPassword());
 		return accResponse;
 	}
+	
+	@PostMapping("/resident-account/change-password")
+	public void changePassword (@RequestBody ResidentAccount acc)
+		throws JsonMappingException, JsonProcessingException, SQLException{
+		dao.updateAccount(acc.getPassword(), acc.getId());
+	}
 }
